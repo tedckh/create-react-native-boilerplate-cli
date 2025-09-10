@@ -135,7 +135,11 @@ console.log('Installing dependencies...');
 execSync('npm install', { stdio: 'inherit' });
 
 console.log('Installing iOS pods...');
-execSync('cd ios && pod install && cd ..', { stdio: 'inherit' });
+if (process.platform === 'darwin') {
+  execSync('cd ios && pod install && cd ..', { stdio: 'inherit' });
+} else {
+  console.log('Skipping iOS pod installation (not on macOS).');
+}
 
 console.log('\nSuccess! Your new React Native project is ready.');
 console.log(`

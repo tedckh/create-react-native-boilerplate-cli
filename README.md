@@ -23,3 +23,11 @@ Once it's finished, your new project is ready to go with a complete Dockerized e
 ## License
 
 ISC
+
+## Important Notes
+
+### iOS Development on macOS
+
+The project creation script includes a step to run `pod install` for iOS native dependencies. This command is part of CocoaPods and **only runs on macOS**.
+
+If you are creating a project on a non-macOS operating system (e.g., Windows or Linux), the script will automatically skip this step. You will need to run `pod install` manually on a macOS machine if you intend to build for iOS.
