@@ -141,6 +141,12 @@ if (process.platform === 'darwin') {
   console.log('Skipping iOS pod installation (not on macOS).');
 }
 
+console.log('Initializing a new git repository...');
+execSync('rm -rf .git', { stdio: 'inherit' });
+execSync('git init', { stdio: 'inherit' });
+execSync('git add .', { stdio: 'inherit' });
+execSync('git commit -m "Initial commit"', { stdio: 'inherit' });
+
 console.log('\nSuccess! Your new React Native project is ready.');
 console.log(`
 Next steps:\n  cd ${projectName}\n  npm run ios # or npm run android`);

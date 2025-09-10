@@ -5,7 +5,9 @@ A simple CLI tool to generate a new project from the [@tedckh/react-native-boile
 ## Usage
 
 To create a new project, run the following command in your terminal:
-  npx @tedckh/create-react-native-boilerplate <your-project-name>
+```bash
+npx @tedckh/create-react-native-boilerplate <your-project-name>
+```
 
 ## What it does
 
