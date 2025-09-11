@@ -47,8 +47,11 @@ const filesToModify = [
   'ios/ReactNativeBoilerplate/AppDelegate.swift',
   'android/app/build.gradle',
   'android/app/src/main/AndroidManifest.xml',
-  'android/app/src/main/java/com/ReactNativeBoilerplate/MainActivity.java',
+  'android/app/src/main/java/com/ReactNativeBoilerplate/MainActivity.kt', 
   'android/settings.gradle',
+  'android/app/src/main/res/values/strings.xml',
+  'android/app/src/main/java/com/ReactNativeBoilerplate/MainApplication.kt',
+  'ios/ReactNativeBoilerplate.xcworkspace/contents.xcworkspacedata', 
 ];
 
 filesToModify.forEach(file => {
@@ -57,6 +60,7 @@ filesToModify.forEach(file => {
     let content = fs.readFileSync(filePath, 'utf8');
     content = content.replace(new RegExp(oldProjectName, 'g'), newProjectName);
     content = content.replace(new RegExp(oldBundleIdentifier, 'g'), newBundleIdentifier);
+    content = content.replace(new RegExp("com.reactnativeboilerplate", 'g'), newBundleIdentifier); 
     fs.writeFileSync(filePath, content);
     console.log(`Updated: ${file}`);
   }
@@ -91,7 +95,6 @@ filesToModifyScope.forEach(file => {
 });
 
 // --- Special Case: Android Java/Kotlin folder structure ---
-// This needs to be renamed based on the new bundle identifier
 const oldJavaPath = path.join(projectPath, 'android', 'app', 'src', 'main', 'java', ...oldBundleIdentifier.split('.'));
 const newJavaPath = path.join(projectPath, 'android', 'app', 'src', 'main', 'java', ...newBundleIdentifier.split('.'));
 
@@ -149,4 +152,6 @@ execSync('git commit -m "Initial commit"', { stdio: 'inherit' });
 
 console.log('\nSuccess! Your new React Native project is ready.');
 console.log(`
-Next steps:\n  cd ${projectName}\n  npm run ios # or npm run android`);
+Next steps:
+  cd ${projectName}
+  npm run ios # or npm run android`);
