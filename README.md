@@ -33,3 +33,15 @@ ISC
 The project creation script includes a step to run `pod install` for iOS native dependencies. This command is part of CocoaPods and **only runs on macOS**.
 
 If you are creating a project on a non-macOS operating system (e.g., Windows or Linux), the script will automatically skip this step. You will need to run `pod install` manually on a macOS machine if you intend to build for iOS.
+
+### A Note on iOS Bundle Identifiers
+
+When you build the iOS app for the first time, Xcode may report an error that the "Bundle Identifier is not available." This happens if the generated ID (e.g., `com.demoapp`) is too generic and has already been registered by another developer.
+
+**Solution:**
+
+1.  In Xcode, open the project settings and go to the **Signing & Capabilities** tab.
+2.  In the "Bundle Identifier" field, change the value to something unique, usually in reverse domain name format.
+3.  For example, change `com.demoapp` to `com.yourname.demoapp` or `com.yourcompany.demoapp`.
+
+This will resolve the registration error and allow you to build the app.
