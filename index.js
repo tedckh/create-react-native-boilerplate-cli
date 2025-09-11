@@ -36,8 +36,8 @@ process.chdir(projectPath);
 
 console.log('Updating project names in core files...');
 
-// --- Content Replacements ---
-const filesToModify = [
+// --- Content Replacements (Generic) ---
+const filesToModifyGeneric = [
   'package.json',
   'app.json',
   'index.js',
@@ -47,14 +47,12 @@ const filesToModify = [
   'ios/ReactNativeBoilerplate/AppDelegate.swift',
   'android/app/build.gradle',
   'android/app/src/main/AndroidManifest.xml',
-  'android/app/src/main/java/com/ReactNativeBoilerplate/MainActivity.kt', 
   'android/settings.gradle',
   'android/app/src/main/res/values/strings.xml',
-  'android/app/src/main/java/com/ReactNativeBoilerplate/MainApplication.kt',
-  'ios/ReactNativeBoilerplate.xcworkspace/contents.xcworkspacedata', 
+  'ios/ReactNativeBoilerplate.xcworkspace/contents.xcworkspacedata',
 ];
 
-filesToModify.forEach(file => {
+filesToModifyGeneric.forEach(file => {
   const filePath = path.join(projectPath, file);
   if (fs.existsSync(filePath)) {
     let content = fs.readFileSync(filePath, 'utf8');
@@ -65,6 +63,40 @@ filesToModify.forEach(file => {
     console.log(`Updated: ${file}`);
   }
 });
+
+// --- Special Case: Android Java/Kotlin folder structure and MainApplication.kt/MainActivity.kt ---
+const oldJavaPath = path.join(projectPath, 'android', 'app', 'src', 'main', 'java', ...oldBundleIdentifier.split('.'));
+const newJavaPath = path.join(projectPath, 'android', 'app', 'src', 'main', 'java', ...newBundleIdentifier.split('.'));
+
+if (fs.existsSync(oldJavaPath)) {
+  execSync(`mkdir -p ${path.dirname(newJavaPath)}`, { stdio: 'inherit' });
+  execSync(`mv ${oldJavaPath} ${newJavaPath}`, { stdio: 'inherit' });
+  console.log(`Renamed Android Java folder: ${oldJavaPath} -> ${newJavaPath}`);
+}
+
+// Update content of MainActivity.kt and MainApplication.kt
+const mainActivityKtPath = path.join(projectPath, 'android', 'app', 'src', 'main', 'java', ...newBundleIdentifier.split('.'), 'MainActivity.kt');
+const mainApplicationKtPath = path.join(projectPath, 'android', 'app', 'src', 'main', 'java', ...newBundleIdentifier.split('.'), 'MainApplication.kt');
+
+[mainActivityKtPath, mainApplicationKtPath].forEach(filePath => {
+  if (fs.existsSync(filePath)) {
+    let content = fs.readFileSync(filePath, 'utf8');
+    content = content.replace(new RegExp(oldProjectName, 'g'), newProjectName);
+    content = content.replace(new RegExp(oldBundleIdentifier, 'g'), newBundleIdentifier);
+    content = content.replace(new RegExp("com.reactnativeboilerplate", 'g'), newBundleIdentifier);
+    fs.writeFileSync(filePath, content);
+    console.log(`Updated Android Kotlin file: ${filePath}`);
+  }
+});
+
+// --- Special Case: LaunchScreen.storyboard content update ---
+const launchScreenPath = path.join(projectPath, 'ios', newProjectName, 'LaunchScreen.storyboard');
+if (fs.existsSync(launchScreenPath)) {
+  let content = fs.readFileSync(launchScreenPath, 'utf8');
+  content = content.replace(new RegExp(oldProjectName, 'g'), newProjectName);
+  fs.writeFileSync(launchScreenPath, content);
+  console.log(`Updated content of LaunchScreen.storyboard: ${launchScreenPath}`);
+}
 
 // --- Update internal package scope names ---
 const oldScopeName = "@my-rn-boilerplate";
@@ -94,16 +126,6 @@ filesToModifyScope.forEach(file => {
   }
 });
 
-// --- Special Case: Android Java/Kotlin folder structure ---
-const oldJavaPath = path.join(projectPath, 'android', 'app', 'src', 'main', 'java', ...oldBundleIdentifier.split('.'));
-const newJavaPath = path.join(projectPath, 'android', 'app', 'src', 'main', 'java', ...newBundleIdentifier.split('.'));
-
-if (fs.existsSync(oldJavaPath)) {
-  execSync(`mkdir -p ${path.dirname(newJavaPath)}`, { stdio: 'inherit' });
-  execSync(`mv ${oldJavaPath} ${newJavaPath}`, { stdio: 'inherit' });
-  console.log(`Renamed Android Java folder: ${oldJavaPath} -> ${newJavaPath}`);
-}
-
 // --- Rename iOS project folders ---
 const oldIosProjectPath = path.join(projectPath, 'ios', oldProjectName);
 const newIosProjectPath = path.join(projectPath, 'ios', newProjectName);
@@ -117,6 +139,13 @@ const newIosXcodeprojPath = path.join(projectPath, 'ios', `${newProjectName}.xco
 if (fs.existsSync(oldIosXcodeprojPath)) {
   execSync(`mv ${oldIosXcodeprojPath} ${newIosXcodeprojPath}`, { stdio: 'inherit' });
   console.log(`Renamed iOS .xcodeproj folder: ${oldIosXcodeprojPath} -> ${newIosXcodeprojPath}`);
+}
+
+const oldIosXcworkspacePath = path.join(projectPath, 'ios', `${oldProjectName}.xcworkspace`);
+const newIosXcworkspacePath = path.join(projectPath, 'ios', `${newProjectName}.xcworkspace`);
+if (fs.existsSync(oldIosXcworkspacePath)) {
+  execSync(`mv ${oldIosXcworkspacePath} ${newIosXcworkspacePath}`, { stdio: 'inherit' });
+  console.log(`Renamed iOS .xcworkspace folder: ${oldIosXcworkspacePath} -> ${newIosXcworkspacePath}`);
 }
 
 // --- Special Case: iOS Scheme File Renaming and Content Update ---
